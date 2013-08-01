@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iyuncai.com uploader -->
+<s:Application
+    xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+
+    click="clickHandler(event)"
+    applicationComplete="applicationCompleteHandler()"
+    backgroundAlpha="0">
+    <s:layout>
+        <s:VerticalLayout/>
+    </s:layout>
+    <!-- Coding here -->
+	<fx:Script>
+	<![CDATA[
+        private var uploadUrl:String;
+        private var onUpload:String;
+
+        private var fileRef:FileReference;
+        private var allFilter:FileFilter = new FileFilter("*", "*");
+        private var fileFilter:FileFilter = new FileFilter("CSV", "*.csv;*.CSV;");
+
+        private function onFile(e:Event):void {
+            var url:URLRequest = new URLRequest(uploadUrl);
+            fileRef.upload(url);
+        }
+        private function onUploadProgress(e:ProgressEvent):void {
+            var percent:Number = Math.round(e.bytesLoaded*100/e.bytesTotal);
+            info.text = percent + "%";
+        }
+        private function onUploadComplete(e:DataEvent):void {
+            info.text = "Upload";
+            if (onUpload && ExternalInterface.available) {
+                ExternalInterface.call(onUpload);
+            }
+        }
+        private function onError(e:IOErrorEvent):void {
+            info.text = "Error";
+            trace(e);
+        }
+        private function browseFile():void {
+            fileRef = new FileReference();
+
+            fileRef.addEventListener(Event.COMPLETE, onFile);
+            fileRef.addEventListener(ProgressEvent.PROGRESS, onUploadProgress);
+            fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onUploadComplete);
+            fileRef.addEventListener(IOErrorEvent.IO_ERROR, onError);
+
+            fileRef.browse([allFilter, fileFilter]);
+        }
+
+        private function clickHandler(e:MouseEvent):void {
+            browseFile();
+        }
+
+        public function applicationCompleteHandler():void {
+            uploadUrl = parameters.uploadUrl;
+            onUpload = parameters.onUpload;
+        }
+	]]>
+	</fx:Script>
+
+    <s:SkinnableContainer width="100%" height="100%" skinClass="RoundedCornerSkin">
+        <s:Group width="100%" height="100%" verticalCenter="0" horizontalCenter="0">
+            <s:Label id="info" text='Upload' fontSize="14" color="white" baseline="16" width="100%" textAlign="center" fontFamily="sans-serif"/>
+        </s:Group>
+    </s:SkinnableContainer>
+</s:Application>
