@@ -29,7 +29,7 @@
             var percent:Number = Math.round(e.bytesLoaded*100/e.bytesTotal);
             info.text = percent + "%";
         }
-        private function onUploadComplete(e:DataEvent):void {
+        private function onUploadComplete(e:Event):void {
             info.text = "Upload...";
             if (onUpload && ExternalInterface.available) {
                 ExternalInterface.call(onUpload);
@@ -44,7 +44,7 @@
 
             fileRef.addEventListener(Event.SELECT, onFile);
             fileRef.addEventListener(ProgressEvent.PROGRESS, onUploadProgress);
-            fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onUploadComplete);
+            fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
 
             fileRef.addEventListener(IOErrorEvent.IO_ERROR, onError);
 
