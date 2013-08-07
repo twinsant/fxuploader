@@ -9,10 +9,10 @@
         <s:State name="disabled" />
     </s:states>
 
-    <s:Rect radiusX="4" radiusY="4"
+    <s:Rect radiusX="3" radiusY="3"
         height="100%" width="100%">
         <s:fill>
-            <s:SolidColor color="#4B8FF9"/>
+            <s:SolidColor color="#DDDDDD"/>
         </s:fill>
     </s:Rect>
 

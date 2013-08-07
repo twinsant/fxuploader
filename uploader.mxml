@@ -64,7 +64,7 @@
 
     <s:SkinnableContainer width="100%" height="100%" skinClass="RoundedCornerSkin">
         <s:Group width="100%" height="100%" verticalCenter="0" horizontalCenter="0">
-            <s:Label id="info" text='Upload...' fontSize="14" color="white" baseline="16" width="100%" textAlign="center" fontFamily="sans-serif"/>
+            <s:Label id="info" text='Upload...' fontSize="14" color="black" baseline="16" width="100%" textAlign="center" fontFamily="sans-serif"/>
         </s:Group>
     </s:SkinnableContainer>
 </s:Application>
