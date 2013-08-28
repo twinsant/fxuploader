@@ -14,12 +14,14 @@
     <!-- Coding here -->
 	<fx:Script>
 	<![CDATA[
+        private var infoText:String;
+        private var fileFilterDescription:String;
+        private var fileFilterExtension:String;
         private var uploadUrl:String;
         private var onUpload:String;
 
         private var fileRef:FileReference;
         private var allFilter:FileFilter = new FileFilter("All", "*");
-        private var fileFilter:FileFilter = new FileFilter("CSV", "*.csv;*.CSV;");
 
         private function onFile(e:Event):void {
             var url:URLRequest = new URLRequest(uploadUrl);
@@ -30,9 +32,13 @@
             info.text = percent + "%";
         }
         private function onUploadComplete(e:Event):void {
-            info.text = "Upload...";
+            info.text = infoText;
+        }
+        private function onResponse(e:DataEvent):void {
+            var result:XML = new XML(e.data);
+            var response:String = result.toString();
             if (onUpload && ExternalInterface.available) {
-                ExternalInterface.call(onUpload);
+                ExternalInterface.call(onUpload, response);
             }
         }
         private function onError(e:IOErrorEvent):void {
@@ -44,11 +50,17 @@
 
             fileRef.addEventListener(Event.SELECT, onFile);
             fileRef.addEventListener(ProgressEvent.PROGRESS, onUploadProgress);
+            fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onResponse);
             fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
 
             fileRef.addEventListener(IOErrorEvent.IO_ERROR, onError);
 
-            fileRef.browse([fileFilter, allFilter]);
+            if (fileFilterDescription && fileFilterExtension) {
+                var fileFilter:FileFilter = new FileFilter(fileFilterDescription, fileFilterExtension);
+                fileRef.browse([fileFilter, allFilter]);
+            }else{
+                fileRef.browse([allFilter]);
+            }
         }
 
         private function clickHandler(e:MouseEvent):void {
@@ -56,6 +68,14 @@
         }
 
         public function applicationCompleteHandler():void {
+            infoText = parameters.infoText;
+            if (infoText==null) {
+                infoText = 'Upload...'
+            }
+            info.text = infoText;
+
+            fileFilterDescription = parameters.filterDesc;
+            fileFilterExtension = parameters.filterExt;
             uploadUrl = parameters.uploadUrl;
             onUpload = parameters.onUpload;
         }
