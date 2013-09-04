@@ -14,6 +14,10 @@
     <!-- Coding here -->
 	<fx:Script>
 	<![CDATA[
+        import mx.controls.Image;
+        import mx.graphics.ImageSnapshot;
+        import mx.graphics.codec.PNGEncoder;
+
         private var infoText:String;
         private var fileFilterDescription:String;
         private var fileFilterExtension:String;
@@ -25,7 +29,19 @@
 
         private function onFile(e:Event):void {
             var url:URLRequest = new URLRequest(uploadUrl);
-            fileRef.upload(url);
+            //fileRef.upload(url);
+            fileRef.load();
+        }
+        private function onLoadComplete(e:Event):void {
+            var image:Image = new Image();
+            image.source = fileRef.data;
+            //image.content.width = 200;
+            //image.content.height = 200;
+            //var snap:ImageSnapshot = ImageSnapshot.captureImage(image)
+            //var text:String = ImageSnapshot.encodeImageAsBase64(snap);
+            //trace(text);
+            //var tmp:FileReference = new FileReference();
+            //tmp.save(snap.data, 'flex-resized.png');
         }
         private function onUploadProgress(e:ProgressEvent):void {
             var percent:Number = Math.round(e.bytesLoaded*100/e.bytesTotal);
@@ -51,7 +67,8 @@
             fileRef.addEventListener(Event.SELECT, onFile);
             fileRef.addEventListener(ProgressEvent.PROGRESS, onUploadProgress);
             fileRef.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, onResponse);
-            fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
+            //fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
+            fileRef.addEventListener(Event.COMPLETE, onLoadComplete);
 
             fileRef.addEventListener(IOErrorEvent.IO_ERROR, onError);
 
