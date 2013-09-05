@@ -39,13 +39,16 @@
             ldr.loadBytes(fileRef.data);
         }
         private function onLoadImage(e:Event):void {
+            var ldrInfo:LoaderInfo = (e.target as LoaderInfo);
+            ldrInfo.removeEventListener(Event.COMPLETE, onLoadImage);
+
             var image:Image = new Image();
             var h:int = 200;
             var ratio:Number = h/e.currentTarget.height;
             var w:int = e.currentTarget.width * ratio;
             image.height = h;
             image.width = w;
-            image.source = fileRef.data;
+            image.source = Bitmap(ldrInfo.content);
             snap = ImageSnapshot.captureImage(image)
             //var text:String = ImageSnapshot.encodeImageAsBase64(snap);
             //trace(text);
@@ -92,7 +95,7 @@
                 browseFile();
             }else{
                 var tmp:FileReference = new FileReference();
-                tmp.save(snap.data, 'flex-resized.png');
+                tmp.save(fileRef.data, 'flex-resized.png');
             }
         }
 
