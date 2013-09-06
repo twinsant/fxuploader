@@ -16,7 +16,7 @@
 	<![CDATA[
         import mx.controls.Image;
         import mx.graphics.ImageSnapshot;
-        import mx.graphics.codec.PNGEncoder;
+        import mx.events.FlexEvent;
 
         private var infoText:String;
         private var fileFilterDescription:String;
@@ -27,38 +27,29 @@
         private var fileRef:FileReference;
         private var allFilter:FileFilter = new FileFilter("All", "*");
         private var snap:ImageSnapshot;
+        private var _snap:Boolean = false;
+        private var imageData:BitmapData = new BitmapData(200, 200);
 
         private function onFile(e:Event):void {
-            var url:URLRequest = new URLRequest(uploadUrl);
-            //fileRef.upload(url);
             fileRef.load();
         }
         private function onLoadComplete(e:Event):void {
-            var ldr:Loader = new Loader();
-            ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadImage);
-            ldr.loadBytes(fileRef.data);
+            image.source = fileRef.data;
+            imageData = new BitmapData(20, 20);
+            var shiftOrigin:Matrix = new Matrix();
+            shiftOrigin.translate(0, 0);
+            imageData.draw(image, shiftOrigin);
         }
-        private function onLoadImage(e:Event):void {
-            var ldrInfo:LoaderInfo = (e.target as LoaderInfo);
-            ldrInfo.removeEventListener(Event.COMPLETE, onLoadImage);
-
-            var image:Image = new Image();
-            var h:int = 200;
-            var ratio:Number = h/e.currentTarget.height;
-            var w:int = e.currentTarget.width * ratio;
-            image.height = h;
-            image.width = w;
-            image.source = Bitmap(ldrInfo.content);
-            snap = ImageSnapshot.captureImage(image)
-            //var text:String = ImageSnapshot.encodeImageAsBase64(snap);
-            //trace(text);
+        private function onImage(e:Event):void {
+            trace(image.width + 'x' + image.height)
+            image.width = width;
+            image.height = height;
+            snap = ImageSnapshot.captureImage(image);
         }
         private function onUploadProgress(e:ProgressEvent):void {
             var percent:Number = Math.round(e.bytesLoaded*100/e.bytesTotal);
-            info.text = percent + "%";
         }
         private function onUploadComplete(e:Event):void {
-            info.text = infoText;
         }
         private function onResponse(e:DataEvent):void {
             var result:XML = new XML(e.data);
@@ -68,7 +59,6 @@
             }
         }
         private function onError(e:IOErrorEvent):void {
-            info.text = "Error";
             trace(e);
         }
         private function browseFile():void {
@@ -95,28 +85,24 @@
                 browseFile();
             }else{
                 var tmp:FileReference = new FileReference();
-                tmp.save(fileRef.data, 'flex-resized.png');
+                tmp.save(snap.data, 'flex-resized.png');
             }
         }
 
         public function applicationCompleteHandler():void {
-            infoText = parameters.infoText;
-            if (infoText==null) {
-                infoText = 'Upload...'
-            }
-            info.text = infoText;
-
             fileFilterDescription = parameters.filterDesc;
             fileFilterExtension = parameters.filterExt;
             uploadUrl = parameters.uploadUrl;
             onUpload = parameters.onUpload;
+
+            image.addEventListener(Event.COMPLETE, onImage);
         }
 	]]>
 	</fx:Script>
 
     <s:SkinnableContainer width="100%" height="100%" skinClass="RoundedCornerSkin">
         <s:Group width="100%" height="100%" verticalCenter="0" horizontalCenter="0">
-            <s:Label id="info" text='Upload...' fontSize="14" color="black" baseline="16" width="100%" textAlign="center" fontFamily="sans-serif"/>
+            <s:Image id="image" />
         </s:Group>
     </s:SkinnableContainer>
 </s:Application>
