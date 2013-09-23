@@ -21,6 +21,8 @@
         private var onUpload:String;
         private var imageWidth:Number = 0;
         private var imageHeight:Number = 0;
+        private var w:Number = 0;
+        private var h:Number = 0;
 
         private var fileRef:FileReference;
         private var allFilter:FileFilter = new FileFilter("All", "*");
@@ -51,6 +53,8 @@
             }
 
             if (pass) {
+                w = bitmap.width;
+                h = bitmap.height;
                 fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
                 var url:URLRequest = new URLRequest(uploadUrl);
                 fileRef.upload(url);
@@ -71,7 +75,7 @@
             var result:XML = new XML(e.data);
             var response:String = result.toString();
             if (onUpload && ExternalInterface.available) {
-                ExternalInterface.call(onUpload, true, response);
+                ExternalInterface.call(onUpload, true, response, w, h);
             }
         }
         private function onError(e:IOErrorEvent):void {
