@@ -19,50 +19,14 @@
         private var fileFilterExtension:String;
         private var uploadUrl:String;
         private var onUpload:String;
-        private var imageWidth:Number = 0;
-        private var imageHeight:Number = 0;
-        private var w:Number = 0;
-        private var h:Number = 0;
 
         private var fileRef:FileReference;
         private var allFilter:FileFilter = new FileFilter("All", "*");
 
         private function onFile(e:Event):void {
-            fileRef.addEventListener(Event.COMPLETE, onLoad);
-            fileRef.load();
-        }
-        private function onLoad(e:Event):void {
-            fileRef.removeEventListener(Event.COMPLETE, onLoad);
-
-            var ldr:Loader = new Loader();
-            ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, onImage);
-            ldr.loadBytes(fileRef.data);
-        }
-        private function onImage(e:Event):void {
-            var bitmap:Bitmap = e.currentTarget.loader.content as Bitmap;
-            var pass:Boolean = true;
-            if (imageWidth!=0) {
-                if (bitmap.width != imageWidth) {
-                    pass = false;
-                }
-            }
-            if (imageHeight!=0) {
-                if (bitmap.height != imageHeight) {
-                    pass = false;
-                }
-            }
-
-            if (pass) {
-                w = bitmap.width;
-                h = bitmap.height;
-                fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
-                var url:URLRequest = new URLRequest(uploadUrl);
-                fileRef.upload(url);
-            }else{
-                if (onUpload && ExternalInterface.available) {
-                    ExternalInterface.call(onUpload, false, '图片必须为' + imageWidth + 'x' + imageHeight + '');
-                }
-            }
+            fileRef.addEventListener(Event.COMPLETE, onUploadComplete);
+            var url:URLRequest = new URLRequest(uploadUrl);
+            fileRef.upload(url);
         }
         private function onUploadProgress(e:ProgressEvent):void {
             var percent:Number = Math.round(e.bytesLoaded*100/e.bytesTotal);
@@ -75,7 +39,7 @@
             var result:XML = new XML(e.data);
             var response:String = result.toString();
             if (onUpload && ExternalInterface.available) {
-                ExternalInterface.call(onUpload, true, response, w, h);
+                ExternalInterface.call(onUpload, true, response);
             }
         }
         private function onError(e:IOErrorEvent):void {
@@ -114,9 +78,6 @@
             fileFilterExtension = parameters.filterExt;
             uploadUrl = parameters.uploadUrl;
             onUpload = parameters.onUpload;
-
-            imageWidth = Number(parameters.imageWidth);
-            imageHeight = Number(parameters.imageHeight);
         }
 	]]>
 	</fx:Script>

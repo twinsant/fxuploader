@@ -1,6 +1,6 @@
 MAIN=uploader.mxml
 SOURCES=$(MAIN) RoundedCornerSkin.mxml
-SWF=uploadImg.swf
+SWF=uploadVideo.swf
 $(SWF):$(SOURCES)
 	mxmlc -output=$(SWF) -debug=true -static-link-runtime-shared-libraries -use-network $(MAIN)
 
